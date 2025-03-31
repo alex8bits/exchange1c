@@ -90,16 +90,16 @@ class CatalogService extends AbstractService
         $this->authService->auth();
         $filename = $this->request->get('filename');
         switch ($filename) {
-            case 'import.xml':
-                {
-                    $this->categoryService->import();
-                    break;
-                }
-            case 'offers.xml':
-                {
-                    $this->offerService->import();
-                    break;
-                }
+            case str_starts_with($filename, 'import'):
+            {
+                $this->categoryService->import();
+                break;
+            }
+            case str_starts_with($filename, 'offers') ||
+                str_starts_with($filename, 'prices') ||
+                str_starts_with($filename, 'rests'):
+                $this->offerService->import();
+                break;
         }
 
         $response = "success\n";

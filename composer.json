@@ -1,5 +1,5 @@
 {
-  "name": "bigperson/exchange1c",
+  "name": "govdnocode/exchange1c",
   "type": "library",
   "description": "Catalog Loader from 1c - CommerceML protocol",
   "keywords": [
@@ -8,12 +8,16 @@
     "1c-exchange",
     "1c-php"
   ],
-  "homepage": "https://github.com/bigperson",
+  "homepage": "https://github.com/govdnocode",
   "license": "MIT",
   "authors": [
     {
       "name": "Anton Kartsev",
       "role": "Developer"
+    },
+    {
+      "name": "Aleksey Balobanov",
+      "role": "Contributor"
     }
   ],
   "minimum-stability": "stable",
@@ -29,7 +33,7 @@
   },
   "require": {
     "php": ">=7.1",
-    "carono/commerceml": "^0.2.3"
+    "carono/commerceml": "^0.2.8"
 
   },
   "require-dev": {
