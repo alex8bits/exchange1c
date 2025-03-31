@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C\Interfaces;
+namespace Alexnsk83\Exchange1C\Interfaces;
 
 use Zenwalker\CommerceML\Model\PropertyCollection;
 

@@ -7,18 +7,18 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C\Services;
+namespace Alexnsk83\Exchange1C\Services;
 
-use Bigperson\Exchange1C\Config;
-use Bigperson\Exchange1C\Events\AfterProductsSync;
-use Bigperson\Exchange1C\Events\AfterUpdateProduct;
-use Bigperson\Exchange1C\Events\BeforeProductsSync;
-use Bigperson\Exchange1C\Events\BeforeUpdateProduct;
-use Bigperson\Exchange1C\Exceptions\Exchange1CException;
-use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
-use Bigperson\Exchange1C\Interfaces\GroupInterface;
-use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
-use Bigperson\Exchange1C\Interfaces\ProductInterface;
+use Alexnsk83\Exchange1C\Config;
+use Alexnsk83\Exchange1C\Events\AfterProductsSync;
+use Alexnsk83\Exchange1C\Events\AfterUpdateProduct;
+use Alexnsk83\Exchange1C\Events\BeforeProductsSync;
+use Alexnsk83\Exchange1C\Events\BeforeUpdateProduct;
+use Alexnsk83\Exchange1C\Exceptions\Exchange1CException;
+use Alexnsk83\Exchange1C\Interfaces\EventDispatcherInterface;
+use Alexnsk83\Exchange1C\Interfaces\GroupInterface;
+use Alexnsk83\Exchange1C\Interfaces\ModelBuilderInterface;
+use Alexnsk83\Exchange1C\Interfaces\ProductInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Product;

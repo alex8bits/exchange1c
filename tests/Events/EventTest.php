@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Tests\Events;
 
-use Bigperson\Exchange1C\Events\BeforeOffersSync;
+use Alexnsk83\Exchange1C\Events\BeforeOffersSync;
 use Tests\TestCase;
 
 /**

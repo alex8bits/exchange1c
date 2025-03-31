@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C\Events;
+namespace Alexnsk83\Exchange1C\Events;
 
 class AfterProductsSync extends AbstractEventInterface
 {

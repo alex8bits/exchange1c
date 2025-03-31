@@ -7,10 +7,10 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C;
+namespace Alexnsk83\Exchange1C;
 
-use Bigperson\Exchange1C\Exceptions\Exchange1CException;
-use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
+use Alexnsk83\Exchange1C\Exceptions\Exchange1CException;
+use Alexnsk83\Exchange1C\Interfaces\ModelBuilderInterface;
 
 /**
  * Class ModelBuilder.

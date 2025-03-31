@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C\Exceptions;
+namespace Alexnsk83\Exchange1C\Exceptions;
 
 /**
  * Class Exchange1CException.

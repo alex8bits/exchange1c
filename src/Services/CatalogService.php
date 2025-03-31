@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C\Services;
+namespace Alexnsk83\Exchange1C\Services;
 
 /**
  * Class Catalog

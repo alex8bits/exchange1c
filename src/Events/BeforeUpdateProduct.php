@@ -7,9 +7,9 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C\Events;
+namespace Alexnsk83\Exchange1C\Events;
 
-use Bigperson\Exchange1C\Interfaces\ProductInterface;
+use Alexnsk83\Exchange1C\Interfaces\ProductInterface;
 
 class BeforeUpdateProduct extends AbstractEventInterface
 {

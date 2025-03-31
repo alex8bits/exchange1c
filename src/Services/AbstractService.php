@@ -7,9 +7,9 @@
  */
 declare(strict_types=1);
 
-namespace Bigperson\Exchange1C\Services;
+namespace Alexnsk83\Exchange1C\Services;
 
-use Bigperson\Exchange1C\Config;
+use Alexnsk83\Exchange1C\Config;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

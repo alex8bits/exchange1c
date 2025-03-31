@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Tests\Models;
 
-use Bigperson\Exchange1C\Interfaces\GroupInterface;
-use Bigperson\Exchange1C\Interfaces\OfferInterface;
+use Alexnsk83\Exchange1C\Interfaces\GroupInterface;
+use Alexnsk83\Exchange1C\Interfaces\OfferInterface;
 
 /**
  * Class OfferTestModel.
