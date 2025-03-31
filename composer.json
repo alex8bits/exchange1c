@@ -32,9 +32,8 @@
     }
   },
   "require": {
-    "php": ">=7.1",
+    "php": ">=8.0",
     "carono/commerceml": "^0.2.8"
-
   },
   "require-dev": {
     "phpunit/phpunit": "^7",
