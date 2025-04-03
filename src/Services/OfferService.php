@@ -82,6 +82,10 @@ class OfferService
         }
         if ($offerClass = $this->getOfferClass()) {
             $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
+            $xml = $commerce->classifier->xml;
+            $commerce->classifier->xml = $commerce->offersXml->Классификатор;
+            $offerClass::createProperties1c($commerce->classifier->getProperties());
+            $commerce->classifier->xml = $xml;
         }
         $this->beforeOfferSync();
         foreach ($commerce->offerPackage->getOffers() as $offer) {

@@ -1,11 +1,7 @@
 # PHP exchange1c - обмен 1С предприятие с сайтом на php
-[![Packagist](https://img.shields.io/packagist/l/bigperson/exchange1c.svg?style=flat-square)](LICENSE)
-[![Packagist](https://img.shields.io/packagist/dt/bigperson/exchange1c.svg?style=flat-square)](https://packagist.org/packages/bigperson/exchange1c)
-[![Packagist](https://img.shields.io/packagist/v/bigperson/exchange1c.svg?style=flat-square)](https://packagist.org/packages/bigperson/exchange1c)
-[![Travis (.org)](https://img.shields.io/travis/bigperson/exchange1c.svg?style=flat-square)](https://travis-ci.org/bigperson/exchange1c)
-[![Codecov](https://img.shields.io/codecov/c/github/bigperson/exchange1c.svg?style=flat-square)](https://codecov.io/gh/bigperson/exchange1c)
-[![StyleCI](https://github.styleci.io/repos/153751681/shield?branch=master)](https://github.styleci.io/repos/153751681)
-
+[![Packagist](https://img.shields.io/packagist/l/alexnsk83/exchange1c.svg?style=flat-square)](LICENSE)
+[![Packagist](https://img.shields.io/packagist/dt/alexnsk83/exchange1c.svg?style=flat-square)](https://packagist.org/packages/bigperson/exchange1c)
+[![Packagist](https://img.shields.io/packagist/v/alexnsk83/exchange1c.svg?style=flat-square)](https://packagist.org/packages/bigperson/exchange1c)
 
 
 
@@ -18,12 +14,12 @@
 Данная библиотека была написана на основе модуля https://github.com/carono/yii2-1c-exchange - все основные интерфейсы взяты именно из этого модуля.
 
 # Зависимости
-* php ^7.1
-* carono/commerceml
-* symfony/http-foundation ^4.1
+* php ^8.0
+* alexnsk83/commerceml
+* symfony/http-foundation ^7.2
 
 # Установка
-`composer require bigperson/exchange1c`
+`composer require alexnsk83/exchange1c`
 
 # Использование
 Для использования библиотеки вам неободимо определить массив конфигов и реализовать интерфейсы в ваших моделях.

@@ -16,6 +16,8 @@ interface OfferInterface extends ExportFieldsInterface, IdentifierInterface
      */
     public function getGroup1c();
 
+    public static function createProperties1c($properties);
+
     /**
      * offers.xml > ПакетПредложений > Предложения > Предложение > Цены.
      *
