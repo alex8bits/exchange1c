@@ -7,9 +7,9 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Interfaces;
+namespace Bigperson\Exchange1C\Interfaces;
 
-use Alexnsk83\Exchange1C\Config;
+use Bigperson\Exchange1C\Config;
 
 /**
  * Class ModelBuilderInterface.

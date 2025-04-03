@@ -7,18 +7,18 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Services;
+namespace Bigperson\Exchange1C\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Events\AfterOffersSync;
-use Alexnsk83\Exchange1C\Events\AfterUpdateOffer;
-use Alexnsk83\Exchange1C\Events\BeforeOffersSync;
-use Alexnsk83\Exchange1C\Events\BeforeUpdateOffer;
-use Alexnsk83\Exchange1C\Exceptions\Exchange1CException;
-use Alexnsk83\Exchange1C\Interfaces\EventDispatcherInterface;
-use Alexnsk83\Exchange1C\Interfaces\ModelBuilderInterface;
-use Alexnsk83\Exchange1C\Interfaces\OfferInterface;
-use Alexnsk83\Exchange1C\Interfaces\ProductInterface;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Events\AfterOffersSync;
+use Bigperson\Exchange1C\Events\AfterUpdateOffer;
+use Bigperson\Exchange1C\Events\BeforeOffersSync;
+use Bigperson\Exchange1C\Events\BeforeUpdateOffer;
+use Bigperson\Exchange1C\Exceptions\Exchange1CException;
+use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
+use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
+use Bigperson\Exchange1C\Interfaces\OfferInterface;
+use Bigperson\Exchange1C\Interfaces\ProductInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Offer;
@@ -74,6 +74,12 @@ class OfferService
         $this->_ids = [];
         $commerce = new CommerceML();
         $commerce->loadOffersXml($this->config->getFullPath($filename));
+        $classifierFile = $this->config->getFullPath('classifier.xml');
+        if ($commerce->classifier->xml) {
+            $commerce->classifier->xml->saveXML($classifierFile);
+        } else {
+            $commerce->classifier->xml = simplexml_load_string(file_get_contents($classifierFile));
+        }
         if ($offerClass = $this->getOfferClass()) {
             $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
         }
@@ -123,7 +129,9 @@ class OfferService
     {
         $this->beforeUpdateOffer($model, $offer);
         $this->parseSpecifications($model, $offer);
+        $this->parseProperties($model, $offer);
         $this->parsePrice($model, $offer);
+        $this->parseRests($model, $offer);
         $this->afterUpdateOffer($model, $offer);
     }
 
@@ -146,6 +154,24 @@ class OfferService
     {
         foreach ($offer->getPrices() as $price) {
             $model->setPrice1c($price);
+        }
+    }
+
+    /**
+     * @param OfferInterface $model
+     * @param Offer          $offer
+     */
+    protected function parseRests(OfferInterface $model, Offer $offer)
+    {
+        $model->setRemnant($offer->getRests());
+    }
+
+    protected function parseProperties(OfferInterface $model, Offer $product): void
+    {
+        if (isset($product->getProperties()->xml->ЗначенияСвойства)) {
+            foreach ($product->getProperties()->xml->ЗначенияСвойства as $property) {
+                $model->setOfferProperty1c($property);
+            }
         }
     }
 

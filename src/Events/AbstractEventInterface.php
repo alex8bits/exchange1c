@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Events;
+namespace Bigperson\Exchange1C\Events;
 
 /**
  * Class AbstractEventInterface.

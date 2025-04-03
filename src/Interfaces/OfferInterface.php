@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Interfaces;
+namespace Bigperson\Exchange1C\Interfaces;
 
 interface OfferInterface extends ExportFieldsInterface, IdentifierInterface
 {
@@ -30,6 +30,17 @@ interface OfferInterface extends ExportFieldsInterface, IdentifierInterface
     public function setPrice1c($price);
 
     /**
+     * offers.xml > ПакетПредложений > Предложения > Предложение > Остатки.
+     *
+     * Остаток товара,
+     *
+     * @param int $rests
+     *
+     * @return void
+     */
+    public function setRemnant($rests);
+
+    /**
      * @param $types
      *
      * @return void
@@ -48,4 +59,12 @@ interface OfferInterface extends ExportFieldsInterface, IdentifierInterface
      * @return void
      */
     public function setSpecification1c($specification);
+
+    /**
+     *
+     * @param \Zenwalker\CommerceML\Model\Property $property
+     *
+     * @return void
+     */
+    public function setOfferProperty1c($property);
 }

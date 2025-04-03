@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Interfaces;
+namespace Bigperson\Exchange1C\Interfaces;
 
 interface WarehouseInterface extends IdentifierInterface
 {

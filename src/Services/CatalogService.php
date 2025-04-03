@@ -7,7 +7,9 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Services;
+namespace Bigperson\Exchange1C\Services;
+
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Catalog
@@ -90,16 +92,20 @@ class CatalogService extends AbstractService
         $this->authService->auth();
         $filename = $this->request->get('filename');
         switch ($filename) {
-            case str_starts_with($filename, 'import'):
+            case str_contains($filename, 'import') && str_contains($filename, 'xml'):
             {
                 $this->categoryService->import();
                 break;
             }
-            case str_starts_with($filename, 'offers') ||
-                str_starts_with($filename, 'prices') ||
-                str_starts_with($filename, 'rests'):
+            case str_contains($filename, 'offers') && str_contains($filename, 'xml'):
+            case str_contains($filename, 'rests') && str_contains($filename, 'xml'):
+            case str_contains($filename, 'prices') && str_contains($filename, 'xml'):
+            {
                 $this->offerService->import();
                 break;
+            }
+            default:
+                Log::debug('Catalog service file not importing : '.$filename);
         }
 
         $response = "success\n";

@@ -7,18 +7,19 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Services;
+namespace Bigperson\Exchange1C\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Events\AfterProductsSync;
-use Alexnsk83\Exchange1C\Events\AfterUpdateProduct;
-use Alexnsk83\Exchange1C\Events\BeforeProductsSync;
-use Alexnsk83\Exchange1C\Events\BeforeUpdateProduct;
-use Alexnsk83\Exchange1C\Exceptions\Exchange1CException;
-use Alexnsk83\Exchange1C\Interfaces\EventDispatcherInterface;
-use Alexnsk83\Exchange1C\Interfaces\GroupInterface;
-use Alexnsk83\Exchange1C\Interfaces\ModelBuilderInterface;
-use Alexnsk83\Exchange1C\Interfaces\ProductInterface;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Events\AfterProductsSync;
+use Bigperson\Exchange1C\Events\AfterUpdateProduct;
+use Bigperson\Exchange1C\Events\BeforeProductsSync;
+use Bigperson\Exchange1C\Events\BeforeUpdateProduct;
+use Bigperson\Exchange1C\Exceptions\Exchange1CException;
+use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
+use Bigperson\Exchange1C\Interfaces\GroupInterface;
+use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
+use Bigperson\Exchange1C\Interfaces\ProductInterface;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Request;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Product;
@@ -31,7 +32,7 @@ class CategoryService
     /**
      * @var array Массив идентификаторов товаров которые были добавлены и обновлены
      */
-    protected $_ids;
+    protected $_ids = [];
 
     /**
      * @var Request
@@ -82,9 +83,11 @@ class CategoryService
         $classifierFile = $this->config->getFullPath('classifier.xml');
         if ($commerce->classifier->xml) {
             $commerce->classifier->xml->saveXML($classifierFile);
+
         } else {
             $commerce->classifier->xml = simplexml_load_string(file_get_contents($classifierFile));
         }
+
         $this->beforeProductsSync();
 
         if ($groupClass = $this->getGroupClass()) {
@@ -92,6 +95,7 @@ class CategoryService
         }
 
         $productClass = $this->getProductClass();
+        $productClass::createPriceTypes1c($commerce->classifier->xml->ТипыЦен);
         $productClass::createProperties1c($commerce->classifier->getProperties());
         foreach ($commerce->catalog->getProducts() as $product) {
             if (!$model = $productClass::createModel1c($product)) {

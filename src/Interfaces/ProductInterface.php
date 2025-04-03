@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Interfaces;
+namespace Bigperson\Exchange1C\Interfaces;
 
 use Zenwalker\CommerceML\Model\PropertyCollection;
 
@@ -50,7 +50,7 @@ interface ProductInterface extends IdentifierInterface
     /**
      * Предпологается, что дерево групп у Вас уже создано (\carono\exchange1c\interfaces\GroupInterface::createTree1c).
      *
-     * @param \Zenwalker\CommerceML\Model\Group $group
+     * @param string $group
      *
      * @return mixed
      */
@@ -104,6 +104,13 @@ interface ProductInterface extends IdentifierInterface
      * @return OfferInterface
      */
     public function getOffer1c($offer);
+
+    /**
+     * @param $types
+     *
+     * @return void
+     */
+    public static function createPriceTypes1c($types);
 
     /**
      * @param \Zenwalker\CommerceML\Model\Product $product

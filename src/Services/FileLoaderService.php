@@ -7,9 +7,9 @@
  */
 declare(strict_types=1);
 
-namespace Alexnsk83\Exchange1C\Services;
+namespace Bigperson\Exchange1C\Services;
 
-use Alexnsk83\Exchange1C\Config;
+use Bigperson\Exchange1C\Config;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -43,12 +43,14 @@ class FileLoaderService
      */
     public function load(): string
     {
+
         $filename = basename($this->request->get('filename'));
         $filePath = $this->config->getFullPath($filename);
         if ($filename === 'orders.xml') {
             throw new \LogicException('This method is not released');
         } else {
             $directory = dirname($filePath);
+            //dd(file_get_contents($this->request->get('file')));
             if (!is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
