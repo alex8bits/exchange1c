@@ -15,7 +15,7 @@
 
 # Зависимости
 * php ^8.0
-* alexnsk83/commerceml
+* alex8bits/commerceml
 * symfony/http-foundation ^7.2
 
 # Установка
