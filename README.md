@@ -19,7 +19,7 @@
 * symfony/http-foundation ^7.2
 
 # Установка
-`composer require alexnsk83/exchange1c`
+`composer require alex8bits/exchange1c`
 
 # Использование
 Для использования библиотеки вам неободимо определить массив конфигов и реализовать интерфейсы в ваших моделях.
