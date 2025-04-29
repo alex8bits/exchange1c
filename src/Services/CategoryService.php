@@ -160,7 +160,7 @@ class CategoryService
      */
     protected function parseProperties(ProductInterface $model, Product $product): void
     {
-        foreach ($product->getProperties() as $property) {
+        foreach ($product->getProperties()->xml->ЗначенияСвойства as $property) {
             $model->setProperty1c($property);
         }
     }
