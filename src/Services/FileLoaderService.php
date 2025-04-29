@@ -46,27 +46,28 @@ class FileLoaderService
 
         $filename = basename($this->request->get('filename'));
         $filePath = $this->config->getFullPath($filename);
-        if ($filename === 'orders.xml') {
+        if (str_contains($filename, 'orders')) {
             throw new \LogicException('This method is not released');
-        } else {
-            $directory = dirname($filePath);
-            //dd(file_get_contents($this->request->get('file')));
-            if (!is_dir($directory)) {
-                mkdir($directory, 0755, true);
-            }
-            $f = fopen($filePath, 'a+');
-            fwrite($f, file_get_contents('php://input'));
-            fclose($f);
-            if ($this->config->isUseZip()) {
-                $zip = new \ZipArchive();
-                $zip->open($filePath);
-                $zip->extractTo($this->config->getImportDir());
-                $zip->close();
-                unlink($filePath);
-            }
-
+        }
+        if (file_exists($filePath)) {
             return "success\n";
         }
+        $directory = dirname($filePath);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+        $f = fopen($filePath, 'a+');
+        fwrite($f, file_get_contents('php://input'));
+        fclose($f);
+        if ($this->config->isUseZip()) {
+            $zip = new \ZipArchive();
+            $zip->open($filePath);
+            $zip->extractTo($this->config->getImportDir());
+            $zip->close();
+            unlink($filePath);
+        }
+
+        return "success\n";
     }
 
     /**
@@ -74,11 +75,11 @@ class FileLoaderService
      */
     public function clearImportDirectory(): void
     {
-        $tmp_files = glob($this->config->getImportDir().DIRECTORY_SEPARATOR.'*.*');
+        /*$tmp_files = glob($this->config->getImportDir().DIRECTORY_SEPARATOR.'*.*');
         if (is_array($tmp_files)) {
             foreach ($tmp_files as $v) {
                 unlink($v);
             }
-        }
+        }*/
     }
 }

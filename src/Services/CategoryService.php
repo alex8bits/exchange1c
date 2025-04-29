@@ -78,6 +78,7 @@ class CategoryService
     public function import(): void
     {
         $filename = basename($this->request->get('filename'));
+        Log::debug('CategoryService import $filename ' . $filename);
         $commerce = new CommerceML();
         $commerce->loadImportXml($this->config->getFullPath($filename));
         $classifierFile = $this->config->getFullPath('classifier.xml');
@@ -182,9 +183,14 @@ class CategoryService
      */
     protected function parseImage(ProductInterface $model, Product $product)
     {
+        Log::debug('parseImage $product->getImages()');
         $images = $product->getImages();
         foreach ($images as $image) {
+            Log::debug('image path ' . $image->path . '. base path ' . $image->basePath);
             $path = $this->config->getFullPath(basename($image->path));
+            if (!file_exists($path)) {
+                sleep(3);
+            }
             if (file_exists($path)) {
                 $model->addImage1c($path, $image->caption);
             }
