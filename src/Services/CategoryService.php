@@ -100,7 +100,8 @@ class CategoryService
         $productClass::createProperties1c($commerce->classifier->getProperties());
         foreach ($commerce->catalog->getProducts() as $product) {
             if (!$model = $productClass::createModel1c($product)) {
-                throw new Exchange1CException("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
+                Log::debug("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
+                //throw new Exchange1CException("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
             }
             $this->parseProduct($model, $product);
             $this->_ids[] = $model->getPrimaryKey();

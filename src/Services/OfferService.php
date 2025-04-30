@@ -19,6 +19,7 @@ use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
 use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
 use Bigperson\Exchange1C\Interfaces\OfferInterface;
 use Bigperson\Exchange1C\Interfaces\ProductInterface;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Request;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Offer;
@@ -95,7 +96,8 @@ class OfferService
                 $this->parseProductOffer($model, $offer);
                 $this->_ids[] = $model->getPrimaryKey();
             } else {
-                throw new Exchange1CException("Продукт $productId не найден в базе");
+                Log::warning("Продукт $productId не найден в базе");
+                //throw new Exchange1CException("Продукт $productId не найден в базе");
             }
             unset($model);
         }
