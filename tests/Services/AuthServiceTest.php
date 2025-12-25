@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Exceptions\Exchange1CException;
-use Alexnsk83\Exchange1C\Services\AuthService;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Exceptions\Exchange1CException;
+use Bigperson\Exchange1C\Services\AuthService;
 use Illuminate\Contracts\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ServerBag;
@@ -32,7 +32,7 @@ class AuthServiceTest extends TestCase
         $request->server
             ->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
+            ->with(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
             ->willReturnOnConsecutiveCalls('logintest', 'passwordtest');
         $session = $this->createMock(SessionInterface::class);
         $request->method('getSession')
@@ -50,15 +50,16 @@ class AuthServiceTest extends TestCase
             'password'   => 'passwordtest',
         ];
         $config = new Config($values);
+        $session = $this->createMock(Session::class);
+
         $request = $this->createMock(Request::class);
         $request->server = $this->createMock(ServerBag::class);
         $request->server
             ->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
+            ->with(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
             ->willReturnOnConsecutiveCalls('logintest', 'passwordtest');
-        $session = $this->createMock(Session::class);
-        $request->method('getSession')
+         $request->method('getSession')
             ->willReturn($session);
 
         $authService = new AuthService($request, $config);
@@ -78,7 +79,7 @@ class AuthServiceTest extends TestCase
         $request->server
             ->expects($this->exactly(2))
             ->method('get')
-            ->withConsecutive(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
+            ->with(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
             ->willReturnOnConsecutiveCalls('logintest', 'falledpassword');
         $session = $this->createMock(SessionInterface::class);
         $request->method('getSession')

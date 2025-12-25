@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Interfaces\EventDispatcherInterface;
-use Alexnsk83\Exchange1C\ModelBuilder;
-use Alexnsk83\Exchange1C\Services\CategoryService;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
+use Bigperson\Exchange1C\ModelBuilder;
+use Bigperson\Exchange1C\Services\CategoryService;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\TestCase;
 
@@ -35,9 +35,10 @@ class CategoryServiceTest extends TestCase
         $builder = new ModelBuilder();
         $request->method('get')
             ->with('filename')
-            ->willReturn('import.xml');
+            ->willReturn('import_2.xml');
 
         $service = new CategoryService($request, $config, $dispatcher, $builder);
+
         $this->assertNull($service->import());
     }
 }

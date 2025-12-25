@@ -19,7 +19,6 @@ use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
 use Bigperson\Exchange1C\Interfaces\GroupInterface;
 use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
 use Bigperson\Exchange1C\Interfaces\ProductInterface;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Request;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Product;
@@ -78,7 +77,6 @@ class CategoryService
     public function import(): void
     {
         $filename = basename($this->request->get('filename'));
-        Log::debug('CategoryService import $filename ' . $filename);
         $commerce = new CommerceML();
         $commerce->loadImportXml($this->config->getFullPath($filename));
         $classifierFile = $this->config->getFullPath('classifier.xml');
@@ -96,12 +94,11 @@ class CategoryService
         }
 
         $productClass = $this->getProductClass();
-        $productClass::createPriceTypes1c($commerce->classifier->xml->ТипыЦен);
+
         $productClass::createProperties1c($commerce->classifier->getProperties());
         foreach ($commerce->catalog->getProducts() as $product) {
             if (!$model = $productClass::createModel1c($product)) {
-                Log::debug("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
-                //throw new Exchange1CException("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
+                throw new Exchange1CException("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
             }
             $this->parseProduct($model, $product);
             $this->_ids[] = $model->getPrimaryKey();
@@ -161,7 +158,7 @@ class CategoryService
      */
     protected function parseProperties(ProductInterface $model, Product $product): void
     {
-        foreach ($product->getProperties()->xml->ЗначенияСвойства as $property) {
+        foreach ($product->getProperties() as $property) {
             $model->setProperty1c($property);
         }
     }
@@ -184,10 +181,8 @@ class CategoryService
      */
     protected function parseImage(ProductInterface $model, Product $product)
     {
-        Log::debug('parseImage $product->getImages()');
         $images = $product->getImages();
         foreach ($images as $image) {
-            Log::debug('image path ' . $image->path . '. base path ' . $image->basePath);
             $path = $this->config->getFullPath(basename($image->path));
             if (!file_exists($path)) {
                 sleep(3);

@@ -74,8 +74,9 @@ class OfferService
         $filename = basename($this->request->get('filename'));
         $this->_ids = [];
         $commerce = new CommerceML();
-        $commerce->loadOffersXml($this->config->getFullPath($filename));
+        var_dump($this->config->getFullPath($filename));
         $classifierFile = $this->config->getFullPath('classifier.xml');
+        $commerce->loadOffersXml($this->config->getFullPath($filename));
         if ($commerce->classifier->xml) {
             $commerce->classifier->xml->saveXML($classifierFile);
         } else {

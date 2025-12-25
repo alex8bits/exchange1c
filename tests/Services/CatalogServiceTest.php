@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Services\AuthService;
-use Alexnsk83\Exchange1C\Services\CatalogService;
-use Alexnsk83\Exchange1C\Services\CategoryService;
-use Alexnsk83\Exchange1C\Services\FileLoaderService;
-use Alexnsk83\Exchange1C\Services\OfferService;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Services\AuthService;
+use Bigperson\Exchange1C\Services\CatalogService;
+use Bigperson\Exchange1C\Services\CategoryService;
+use Bigperson\Exchange1C\Services\FileLoaderService;
+use Bigperson\Exchange1C\Services\OfferService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Tests\TestCase;
@@ -82,8 +82,7 @@ class CatalogServiceTest extends TestCase
         $auth = $this->createMock(AuthService::class);
         $auth->method('auth');
         $category = $this->createMock(CategoryService::class);
-        $category->method('import')
-            ->willReturn('success');
+        $category->method('import');
         $offer = $this->createMock(OfferService::class);
         $service = new CatalogService($request, $config, $auth, $loader, $category, $offer);
 

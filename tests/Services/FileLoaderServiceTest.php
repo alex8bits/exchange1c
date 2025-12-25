@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Services\FileLoaderService;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Services\FileLoaderService;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\TestCase;
 
