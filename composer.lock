@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "alex8bits/commerceml",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/alex8bits/php-commerceml.git",
-                "reference": "7b23727c3aa430e3320756b77aaae80b3febd9c2"
+                "reference": "2f4c3a6cdf19144ee5ffe1e99d94c1c27fe8e8bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alex8bits/php-commerceml/zipball/7b23727c3aa430e3320756b77aaae80b3febd9c2",
-                "reference": "7b23727c3aa430e3320756b77aaae80b3febd9c2",
+                "url": "https://api.github.com/repos/alex8bits/php-commerceml/zipball/2f4c3a6cdf19144ee5ffe1e99d94c1c27fe8e8bf",
+                "reference": "2f4c3a6cdf19144ee5ffe1e99d94c1c27fe8e8bf",
                 "shasum": ""
             },
             "require": {
@@ -62,9 +62,9 @@
                 "commerceml"
             ],
             "support": {
-                "source": "https://github.com/alex8bits/php-commerceml/tree/1.1.1"
+                "source": "https://github.com/alex8bits/php-commerceml/tree/1.1.2"
             },
-            "time": "2025-12-25T16:06:53+00:00"
+            "time": "2025-12-26T10:46:23+00:00"
         }
     ],
     "packages-dev": [

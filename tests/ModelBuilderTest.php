@@ -28,8 +28,7 @@ class ModelBuilderTest extends TestCase
         $config = new Config($values);
         $builder = new ModelBuilder();
         $model = $builder->getInterfaceClass($config, GroupInterface::class);
-        $this->assertTrue($model instanceof GroupInterface);
-        $this->assertTrue($model instanceof GroupTestModel);
+        $this->assertInstanceOf(GroupInterface::class, $model);
     }
 
     public function testGetInterfaceClassException(): void

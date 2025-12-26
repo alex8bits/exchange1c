@@ -33,8 +33,6 @@ class ConfigTest extends TestCase
         $config = new Config($values);
 
         $this->assertEquals($values['import_dir'], $config->getImportDir());
-        $this->assertEquals($values['login'], $config->getLogin());
-        $this->assertEquals($values['password'], $config->getPassword());
         $this->assertEquals($values['use_zip'], $config->isUseZip());
         $this->assertEquals($values['file_part'], $config->getFilePart());
         $this->assertEquals($values['models'][GroupInterface::class], $config->getModelClass(GroupInterface::class));

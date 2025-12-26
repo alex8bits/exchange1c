@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of bigperson/exchange1c package.
  *
@@ -9,7 +10,8 @@ declare(strict_types=1);
 
 namespace Bigperson\Exchange1C\Services;
 
-use Illuminate\Support\Facades\Log;
+use Bigperson\Exchange1C\Exceptions\Exchange1CException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class Catalog
@@ -29,11 +31,12 @@ class CatalogService extends AbstractService
      * - значение Cookie.
      * Примечание. Все последующие запросы к системе управления сайтом со стороны "1С:Предприятия" содержат в заголовке запроса имя и значение Cookie.
      *
+     * @param \Symfony\Component\HttpFoundation\Request $request
      * @return string
      */
-    public function checkauth(): string
+    public function checkauth(Request $request): string
     {
-        return $this->authService->checkAuth();
+        return $this->authService->checkAuth($request);
     }
 
     /**
@@ -47,15 +50,16 @@ class CatalogService extends AbstractService
      * 2. file_limit=<число>, где <число> - максимально допустимый размер файла в байтах для передачи за один запрос.
      * Если системе "1С:Предприятие" понадобится передать файл большего размера, его следует разделить на фрагменты.
      *
+     * @param \Symfony\Component\HttpFoundation\Request $request
      * @return string
      */
-    public function init(): string
+    public function init(Request $request): string
     {
-        $this->authService->auth();
+        $this->authService->auth($request);
         $this->loaderService->clearImportDirectory();
         $zipEnable = function_exists('zip_open') && $this->config->isUseZip();
-        $response = 'zip='.($zipEnable ? 'yes' : 'no')."\n";
-        $response .= 'file_limit='.$this->config->getFilePart();
+        $response = 'zip=' . ($zipEnable ? 'yes' : 'no') . "\n";
+        $response .= 'file_limit=' . $this->config->getFilePart();
 
         return $response;
     }
@@ -63,13 +67,14 @@ class CatalogService extends AbstractService
     /**
      * Загрузка и сохранение файлов на сервер
      *
+     * @param \Symfony\Component\HttpFoundation\Request $request
      * @return string
      */
-    public function file(): string
+    public function file(Request $request): string
     {
-        $this->authService->auth();
+        $this->authService->auth($request);
 
-        return $this->loaderService->load();
+        return $this->loaderService->load($request->query->get('filename'));
     }
 
     /**
@@ -85,34 +90,23 @@ class CatalogService extends AbstractService
      * обработки запроса.
      * Если произошла необрабатываемая ошибка уровня ядра продукта или sql-запроса, то будет возвращен html-код.
      *
-     * @return string
+     * @throws \Bigperson\Exchange1C\Exceptions\Exchange1CException
      */
-    public function import(): string
+    public function import(Request $request, string $filename): void
     {
-        $this->authService->auth();
-        $filename = $this->request->get('filename');
+        $this->authService->auth($request);
+
         switch ($filename) {
-            case str_contains($filename, 'import') && str_contains($filename, 'xml'):
-            {
-                $this->categoryService->import();
+            case str_contains($filename, 'import') && str_ends_with($filename, 'xml'):
+                $this->categoryService->import($filename);
                 break;
-            }
-            case str_contains($filename, 'offers') && str_contains($filename, 'xml'):
-            case str_contains($filename, 'rests') && str_contains($filename, 'xml'):
-            case str_contains($filename, 'prices') && str_contains($filename, 'xml'):
-            {
-                $this->offerService->import();
+            case str_contains($filename, 'offers') && str_ends_with($filename, 'xml'):
+            case str_contains($filename, 'rests') && str_ends_with($filename, 'xml'):
+            case str_contains($filename, 'prices') && str_ends_with($filename, 'xml'):
+                $this->offerService->import($filename);
                 break;
-            }
             default:
-                Log::debug('Catalog service file not importing : '.$filename);
+                throw new Exchange1CException("Unsupported file for import: $filename");
         }
-
-        $response = "success\n";
-        $response .= "laravel_session\n";
-        $response .= $this->request->getSession()->getId()."\n";
-        $response .= 'timestamp='.time();
-
-        return $response;
     }
 }

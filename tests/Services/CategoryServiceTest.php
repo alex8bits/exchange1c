@@ -20,6 +20,7 @@ class CategoryServiceTest extends TestCase
 {
     public function testImport(): void
     {
+        $this->expectNotToPerformAssertions();
         $configValues = [
             'import_dir' => __DIR__.'/../xml',
             'models'     => [
@@ -35,10 +36,9 @@ class CategoryServiceTest extends TestCase
         $builder = new ModelBuilder();
         $request->method('get')
             ->with('filename')
-            ->willReturn('import_2.xml');
+            ->willReturn('import.xml');
 
-        $service = new CategoryService($request, $config, $dispatcher, $builder);
-
-        $this->assertNull($service->import());
+        $service = new CategoryService($config, $dispatcher, $builder);
+        $service->import('import.xml');
     }
 }

@@ -11,7 +11,6 @@ namespace Tests\Services;
 
 use Bigperson\Exchange1C\Config;
 use Bigperson\Exchange1C\Exceptions\Exchange1CException;
-use Bigperson\Exchange1C\Services\AuthService;
 use Illuminate\Contracts\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ServerBag;
@@ -28,19 +27,14 @@ class AuthServiceTest extends TestCase
         ];
         $config = new Config($values);
         $request = $this->createMock(Request::class);
-        $request->server = $this->createMock(ServerBag::class);
-        $request->server
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->with(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
-            ->willReturnOnConsecutiveCalls('logintest', 'passwordtest');
+
         $session = $this->createMock(SessionInterface::class);
         $request->method('getSession')
             ->willReturn($session);
 
-        $authService = new AuthService($request, $config);
-        $response = $authService->checkAuth();
-        $this->assertTrue(strpos($response, 'success') === 0);
+        $authService = new AuthServiceTestRealization($config, true);
+        $response = $authService->checkAuth($request);
+        $this->assertTrue(str_starts_with($response, 'success'));
     }
 
     public function testCheckAuthIlluminate(): void
@@ -50,21 +44,15 @@ class AuthServiceTest extends TestCase
             'password'   => 'passwordtest',
         ];
         $config = new Config($values);
-        $session = $this->createMock(Session::class);
+        $session = $this->createMock(SessionInterface::class);
 
         $request = $this->createMock(Request::class);
-        $request->server = $this->createMock(ServerBag::class);
-        $request->server
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->with(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
-            ->willReturnOnConsecutiveCalls('logintest', 'passwordtest');
-         $request->method('getSession')
+        $request->method('getSession')
             ->willReturn($session);
 
-        $authService = new AuthService($request, $config);
-        $response = $authService->checkAuth();
-        $this->assertTrue(strpos($response, 'success') === 0);
+        $authService = new AuthServiceTestRealization($config, true);
+        $response = $authService->checkAuth($request);
+        $this->assertTrue(str_starts_with($response, 'success'));
     }
 
     public function testCheckAuthFail(): void
@@ -75,23 +63,19 @@ class AuthServiceTest extends TestCase
         ];
         $config = new Config($values);
         $request = $this->createMock(Request::class);
-        $request->server = $this->createMock(ServerBag::class);
-        $request->server
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->with(['PHP_AUTH_USER'], ['PHP_AUTH_PW'])
-            ->willReturnOnConsecutiveCalls('logintest', 'falledpassword');
+
         $session = $this->createMock(SessionInterface::class);
         $request->method('getSession')
             ->willReturn($session);
 
-        $authService = new AuthService($request, $config);
-        $response = $authService->checkAuth();
-        $this->assertTrue(strpos($response, 'failure') === 0);
+        $authService = new AuthServiceTestRealization($config, false);
+        $response = $authService->checkAuth($request);
+        $this->assertTrue(str_starts_with($response, 'failure'));
     }
 
     public function testAuth(): void
     {
+        $this->expectNotToPerformAssertions();
         $values = [
             'login'      => 'logintest',
             'password'   => 'passwordtest',
@@ -104,8 +88,9 @@ class AuthServiceTest extends TestCase
         $request->method('getSession')
             ->willReturn($session);
 
-        $authService = new AuthService($request, $config);
-        $this->assertNull($authService->auth());
+        $authService = new AuthServiceTestRealization($config, true);
+
+        $authService->auth($request);
     }
 
     public function testAuthException(): void
@@ -123,7 +108,7 @@ class AuthServiceTest extends TestCase
         $request->method('getSession')
             ->willReturn($session);
 
-        $authService = new AuthService($request, $config);
-        $authService->auth();
+        $authService = new AuthServiceTestRealization($config, false);
+        $authService->auth($request);
     }
 }

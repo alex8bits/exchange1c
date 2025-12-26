@@ -20,6 +20,7 @@ class OfferServiceTest extends TestCase
 {
     public function testImport(): void
     {
+        $this->expectNotToPerformAssertions();
         $configValues = [
             'import_dir' => __DIR__.'/../xml',
             'models'     => [
@@ -31,13 +32,14 @@ class OfferServiceTest extends TestCase
 
         $config = new Config($configValues);
         $request = $this->createMock(Request::class);
+
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $builder = new ModelBuilder();
         $request->method('get')
             ->with('filename')
             ->willReturn('offers.xml');
 
-        $service = new OfferService($request, $config, $dispatcher, $builder);
-        $this->assertNull($service->import());
+        $service = new OfferService($config, $dispatcher, $builder);
+        $service->import('offers.xml');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of bigperson/exchange1c package.
  *
@@ -19,8 +20,6 @@ use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
 use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
 use Bigperson\Exchange1C\Interfaces\OfferInterface;
 use Bigperson\Exchange1C\Interfaces\ProductInterface;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Request;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Offer;
 
@@ -32,35 +31,29 @@ class OfferService
     /**
      * @var array Массив идентификаторов торговых предложений которые были добавлены и обновлены
      */
-    private $_ids;
-    /**
-     * @var Request
-     */
-    private $request;
+    private array $_ids;
     /**
      * @var Config
      */
-    private $config;
+    private Config $config;
     /**
      * @var EventDispatcherInterface
      */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
     /**
      * @var ModelBuilderInterface
      */
-    private $modelBuilder;
+    private ModelBuilderInterface $modelBuilder;
 
     /**
      * CategoryService constructor.
      *
-     * @param Request                  $request
-     * @param Config                   $config
+     * @param Config $config
      * @param EventDispatcherInterface $dispatcher
-     * @param ModelBuilderInterface    $modelBuilder
+     * @param ModelBuilderInterface $modelBuilder
      */
-    public function __construct(Request $request, Config $config, EventDispatcherInterface $dispatcher, ModelBuilderInterface $modelBuilder)
+    public function __construct(Config $config, EventDispatcherInterface $dispatcher, ModelBuilderInterface $modelBuilder)
     {
-        $this->request = $request;
         $this->config = $config;
         $this->dispatcher = $dispatcher;
         $this->modelBuilder = $modelBuilder;
@@ -69,12 +62,13 @@ class OfferService
     /**
      * @throws Exchange1CException
      */
-    public function import()
+    public function import(string $filename): void
     {
-        $filename = basename($this->request->get('filename'));
+        $filename = basename($filename);
+
         $this->_ids = [];
         $commerce = new CommerceML();
-        var_dump($this->config->getFullPath($filename));
+
         $classifierFile = $this->config->getFullPath('classifier.xml');
         $commerce->loadOffersXml($this->config->getFullPath($filename));
         if ($commerce->classifier->xml) {
@@ -84,10 +78,6 @@ class OfferService
         }
         if ($offerClass = $this->getOfferClass()) {
             $offerClass::createPriceTypes1c($commerce->offerPackage->getPriceTypes());
-            $xml = $commerce->classifier->xml;
-            $commerce->classifier->xml = $commerce->offersXml->Классификатор;
-            $offerClass::createProperties1c($commerce->classifier->getProperties());
-            $commerce->classifier->xml = $xml;
         }
         $this->beforeOfferSync();
         foreach ($commerce->offerPackage->getOffers() as $offer) {
@@ -97,89 +87,11 @@ class OfferService
                 $this->parseProductOffer($model, $offer);
                 $this->_ids[] = $model->getPrimaryKey();
             } else {
-                Log::warning("Продукт $productId не найден в базе");
-                //throw new Exchange1CException("Продукт $productId не найден в базе");
+                throw new Exchange1CException("Продукт $productId не найден в базе");
             }
             unset($model);
         }
         $this->afterOfferSync();
-    }
-
-    /**
-     * @return OfferInterface|null
-     */
-    private function getOfferClass(): ?OfferInterface
-    {
-        return $this->modelBuilder->getInterfaceClass($this->config, OfferInterface::class);
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return ProductInterface|null
-     */
-    protected function findProductModelById(string $id): ?ProductInterface
-    {
-        /**
-         * @var ProductInterface
-         */
-        $class = $this->modelBuilder->getInterfaceClass($this->config, ProductInterface::class);
-
-        return $class::findProductBy1c($id);
-    }
-
-    /**
-     * @param OfferInterface $model
-     * @param Offer          $offer
-     */
-    protected function parseProductOffer(OfferInterface $model, Offer $offer): void
-    {
-        $this->beforeUpdateOffer($model, $offer);
-        $this->parseSpecifications($model, $offer);
-        $this->parseProperties($model, $offer);
-        $this->parsePrice($model, $offer);
-        $this->parseRests($model, $offer);
-        $this->afterUpdateOffer($model, $offer);
-    }
-
-    /**
-     * @param OfferInterface $model
-     * @param Offer          $offer
-     */
-    protected function parseSpecifications(OfferInterface $model, Offer $offer)
-    {
-        foreach ($offer->getSpecifications() as $specification) {
-            $model->setSpecification1c($specification);
-        }
-    }
-
-    /**
-     * @param OfferInterface $model
-     * @param Offer          $offer
-     */
-    protected function parsePrice(OfferInterface $model, Offer $offer)
-    {
-        foreach ($offer->getPrices() as $price) {
-            $model->setPrice1c($price);
-        }
-    }
-
-    /**
-     * @param OfferInterface $model
-     * @param Offer          $offer
-     */
-    protected function parseRests(OfferInterface $model, Offer $offer)
-    {
-        $model->setRemnant($offer->getRests());
-    }
-
-    protected function parseProperties(OfferInterface $model, Offer $product): void
-    {
-        if (isset($product->getProperties()->xml->ЗначенияСвойства)) {
-            foreach ($product->getProperties()->xml->ЗначенияСвойства as $property) {
-                $model->setOfferProperty1c($property);
-            }
-        }
     }
 
     public function beforeOfferSync(): void
@@ -196,9 +108,9 @@ class OfferService
 
     /**
      * @param OfferInterface $model
-     * @param Offer          $offer
+     * @param Offer $offer
      */
-    public function beforeUpdateOffer(OfferInterface $model, Offer $offer)
+    public function beforeUpdateOffer(OfferInterface $model, Offer $offer): void
     {
         $event = new BeforeUpdateOffer($model, $offer);
         $this->dispatcher->dispatch($event);
@@ -206,11 +118,68 @@ class OfferService
 
     /**
      * @param OfferInterface $model
-     * @param Offer          $offer
+     * @param Offer $offer
      */
-    public function afterUpdateOffer(OfferInterface $model, Offer $offer)
+    public function afterUpdateOffer(OfferInterface $model, Offer $offer): void
     {
         $event = new AfterUpdateOffer($model, $offer);
         $this->dispatcher->dispatch($event);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return ProductInterface|null
+     */
+    protected function findProductModelById(string $id): ?ProductInterface
+    {
+        /**
+         * @var ProductInterface $class
+         */
+        $class = $this->modelBuilder->getInterfaceClass($this->config, ProductInterface::class);
+
+        return $class::findProductBy1c($id);
+    }
+
+    /**
+     * @param OfferInterface $model
+     * @param Offer $offer
+     */
+    protected function parseProductOffer(OfferInterface $model, Offer $offer): void
+    {
+        $this->beforeUpdateOffer($model, $offer);
+        $this->parseSpecifications($model, $offer);
+        $this->parsePrice($model, $offer);
+        $this->afterUpdateOffer($model, $offer);
+    }
+
+    /**
+     * @param OfferInterface $model
+     * @param Offer $offer
+     */
+    protected function parseSpecifications(OfferInterface $model, Offer $offer): void
+    {
+        foreach ($offer->getSpecifications() as $specification) {
+            $model->setSpecification1c($specification);
+        }
+    }
+
+    /**
+     * @param OfferInterface $model
+     * @param Offer $offer
+     */
+    protected function parsePrice(OfferInterface $model, Offer $offer): void
+    {
+        foreach ($offer->getPrices() as $price) {
+            $model->setPrice1c($price);
+        }
+    }
+
+    /**
+     * @return OfferInterface|null
+     */
+    private function getOfferClass(): ?OfferInterface
+    {
+        return $this->modelBuilder->getInterfaceClass($this->config, OfferInterface::class);
     }
 }
