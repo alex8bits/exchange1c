@@ -19,8 +19,6 @@ use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
 use Bigperson\Exchange1C\Interfaces\GroupInterface;
 use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
 use Bigperson\Exchange1C\Interfaces\ProductInterface;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Request;
 use Zenwalker\CommerceML\CommerceML;
 use Zenwalker\CommerceML\Model\Product;
 
@@ -32,39 +30,23 @@ class CategoryService
     /**
      * @var array Массив идентификаторов товаров которые были добавлены и обновлены
      */
-    protected $_ids = [];
+    protected array $_ids = [];
 
-    /**
-     * @var Request
-     */
-    private $request;
+    private Config $config;
 
-    /**
-     * @var Config
-     */
-    private $config;
+    private EventDispatcherInterface $dispatcher;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var ModelBuilderInterface
-     */
-    private $modelBuilder;
+    private ModelBuilderInterface $modelBuilder;
 
     /**
      * CategoryService constructor.
      *
-     * @param Request                  $request
      * @param Config                   $config
      * @param EventDispatcherInterface $dispatcher
      * @param ModelBuilderInterface    $modelBuilder
      */
-    public function __construct(Request $request, Config $config, EventDispatcherInterface $dispatcher, ModelBuilderInterface $modelBuilder)
+    public function __construct(Config $config, EventDispatcherInterface $dispatcher, ModelBuilderInterface $modelBuilder)
     {
-        $this->request = $request;
         $this->config = $config;
         $this->dispatcher = $dispatcher;
         $this->modelBuilder = $modelBuilder;
@@ -75,16 +57,14 @@ class CategoryService
      *
      * @throws Exchange1CException
      */
-    public function import(): void
+    public function import(string $filename): void
     {
-        $filename = basename($this->request->get('filename'));
-        Log::debug('CategoryService import $filename ' . $filename);
+        $filename = basename($filename);
         $commerce = new CommerceML();
         $commerce->loadImportXml($this->config->getFullPath($filename));
         $classifierFile = $this->config->getFullPath('classifier.xml');
         if ($commerce->classifier->xml) {
             $commerce->classifier->xml->saveXML($classifierFile);
-
         } else {
             $commerce->classifier->xml = simplexml_load_string(file_get_contents($classifierFile));
         }
@@ -96,12 +76,11 @@ class CategoryService
         }
 
         $productClass = $this->getProductClass();
-        $productClass::createPriceTypes1c($commerce->classifier->xml->ТипыЦен);
+
         $productClass::createProperties1c($commerce->classifier->getProperties());
         foreach ($commerce->catalog->getProducts() as $product) {
             if (!$model = $productClass::createModel1c($product)) {
-                Log::debug("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
-                //throw new Exchange1CException("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
+                throw new Exchange1CException("Модель продукта не найдена, проверьте реализацию $productClass::createModel1c");
             }
             $this->parseProduct($model, $product);
             $this->_ids[] = $model->getPrimaryKey();
@@ -161,7 +140,7 @@ class CategoryService
      */
     protected function parseProperties(ProductInterface $model, Product $product): void
     {
-        foreach ($product->getProperties()->xml->ЗначенияСвойства as $property) {
+        foreach ($product->getProperties() as $property) {
             $model->setProperty1c($property);
         }
     }
@@ -184,10 +163,8 @@ class CategoryService
      */
     protected function parseImage(ProductInterface $model, Product $product)
     {
-        Log::debug('parseImage $product->getImages()');
         $images = $product->getImages();
         foreach ($images as $image) {
-            Log::debug('image path ' . $image->path . '. base path ' . $image->basePath);
             $path = $this->config->getFullPath(basename($image->path));
             if (!file_exists($path)) {
                 sleep(3);

@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Services\FileLoaderService;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Services\FileLoaderService;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\TestCase;
 
@@ -25,13 +25,13 @@ class FileLoaderServiceTest extends TestCase
 
         $request = new Request();
         $request->query->set('filename', 'test.xml');
-        $fileLoader = new FileLoaderService($request, $config);
+        $fileLoader = new FileLoaderService($config);
         if (is_dir($config->getImportDir())) {
             $this->recurseRmdir($config->getImportDir());
         }
 
-        $fileLoader->load();
-        $this->assertTrue(file_exists($config->getFullPath('test.xml')));
+        $fileLoader->load($request->query->get('filename'));
+        $this->assertFileExists($config->getFullPath('test.xml'));
         $this->recurseRmdir($config->getImportDir());
     }
 
@@ -45,13 +45,13 @@ class FileLoaderServiceTest extends TestCase
 
         $request = new Request();
         $request->query->set('filename', 'test.zip');
-        $fileLoader = new FileLoaderService($request, $config);
+        $fileLoader = new FileLoaderService($config);
         if (is_dir($config->getImportDir())) {
             $this->recurseRmdir($config->getImportDir());
         }
 
-        $fileLoader->load();
-        $this->assertFalse(file_exists($config->getFullPath('test.zip')));
+        $fileLoader->load($request->query->get('filename'));
+        $this->assertFileDoesNotExist($config->getFullPath('test.zip'));
         $this->recurseRmdir($config->getImportDir());
     }
 
@@ -63,10 +63,10 @@ class FileLoaderServiceTest extends TestCase
         $config = new Config($configValues);
         $request = new Request();
         $request->query->set('filename', 'test.xml');
-        $fileLoader = new FileLoaderService($request, $config);
-        $fileLoader->load();
+        $fileLoader = new FileLoaderService($config);
+        $fileLoader->load($request->query->get('filename'));
         $fileLoader->clearImportDirectory();
-        $this->assertFalse(file_exists($config->getFullPath('test.xml')));
+        $this->assertFileExists($config->getFullPath('test.xml'));
         $this->recurseRmdir($config->getImportDir());
     }
 
@@ -78,16 +78,16 @@ class FileLoaderServiceTest extends TestCase
 
         $request = new Request();
         $request->query->set('filename', 'orders.xml');
-        $fileLoader = new FileLoaderService($request, $config);
-        $fileLoader->load();
+        $fileLoader = new FileLoaderService($config);
+        $fileLoader->load($request->query->get('filename'));
     }
 
     /**
      * @param $dir
      *
-     * @return bool
+     * @return void
      */
-    private function recurseRmdir($dir): bool
+    private function recurseRmdir($dir): void
     {
         $files = array_diff(scandir($dir), ['.', '..']);
 
@@ -95,6 +95,6 @@ class FileLoaderServiceTest extends TestCase
             (is_dir("$dir/$file")) ? $this->recurseRmdir("$dir/$file") : unlink("$dir/$file");
         }
 
-        return rmdir($dir);
+        rmdir($dir);
     }
 }

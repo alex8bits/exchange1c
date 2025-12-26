@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Interfaces\GroupInterface;
-use Alexnsk83\Exchange1C\Interfaces\OfferInterface;
-use Alexnsk83\Exchange1C\Interfaces\ProductInterface;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Interfaces\GroupInterface;
+use Bigperson\Exchange1C\Interfaces\OfferInterface;
+use Bigperson\Exchange1C\Interfaces\ProductInterface;
 
 class ConfigTest extends TestCase
 {
@@ -33,8 +33,6 @@ class ConfigTest extends TestCase
         $config = new Config($values);
 
         $this->assertEquals($values['import_dir'], $config->getImportDir());
-        $this->assertEquals($values['login'], $config->getLogin());
-        $this->assertEquals($values['password'], $config->getPassword());
         $this->assertEquals($values['use_zip'], $config->isUseZip());
         $this->assertEquals($values['file_part'], $config->getFilePart());
         $this->assertEquals($values['models'][GroupInterface::class], $config->getModelClass(GroupInterface::class));

@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Interfaces\EventDispatcherInterface;
-use Alexnsk83\Exchange1C\ModelBuilder;
-use Alexnsk83\Exchange1C\Services\CategoryService;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
+use Bigperson\Exchange1C\ModelBuilder;
+use Bigperson\Exchange1C\Services\CategoryService;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\TestCase;
 
@@ -20,6 +20,7 @@ class CategoryServiceTest extends TestCase
 {
     public function testImport(): void
     {
+        $this->expectNotToPerformAssertions();
         $configValues = [
             'import_dir' => __DIR__.'/../xml',
             'models'     => [
@@ -37,7 +38,7 @@ class CategoryServiceTest extends TestCase
             ->with('filename')
             ->willReturn('import.xml');
 
-        $service = new CategoryService($request, $config, $dispatcher, $builder);
-        $this->assertNull($service->import());
+        $service = new CategoryService($config, $dispatcher, $builder);
+        $service->import('import.xml');
     }
 }

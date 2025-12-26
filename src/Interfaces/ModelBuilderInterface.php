@@ -20,9 +20,9 @@ interface ModelBuilderInterface
      * Если модель в конфиге не установлена, то импорт не будет произведен.
      *
      * @param Config $config
-     * @param string $interface
+     * @param class-string<ProductInterface> $interface
      *
      * @return null|mixed
      */
-    public function getInterfaceClass(Config $config, string $interface);
+    public function getInterfaceClass(Config $config, string $interface): mixed;
 }

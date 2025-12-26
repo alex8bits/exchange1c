@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of bigperson/exchange1c package.
  *
@@ -10,62 +11,39 @@ declare(strict_types=1);
 namespace Bigperson\Exchange1C\Services;
 
 use Bigperson\Exchange1C\Config;
-use Symfony\Component\HttpFoundation\Request;
+use Bigperson\Exchange1C\Interfaces\AuthServiceInterface;
 
 /**
  * Class AbstractService.
  */
 abstract class AbstractService
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected Config $config;
 
-    /**
-     * @var Config
-     */
-    protected $config;
+    protected AuthServiceInterface $authService;
 
-    /**
-     * @var AuthService
-     */
-    protected $authService;
+    protected FileLoaderService $loaderService;
 
-    /**
-     * @var FileLoaderService
-     */
-    protected $loaderService;
+    protected CategoryService $categoryService;
 
-    /**
-     * @var CategoryService
-     */
-    protected $categoryService;
-
-    /**
-     * @var OfferService
-     */
-    protected $offerService;
+    protected OfferService $offerService;
 
     /**
      * AbstractService constructor.
      *
-     * @param Request           $request
-     * @param Config            $config
-     * @param AuthService       $authService
+     * @param Config $config
+     * @param AuthServiceInterface $authService
      * @param FileLoaderService $loaderService
-     * @param CategoryService   $categoryService
-     * @param OfferService      $offerService
+     * @param CategoryService $categoryService
+     * @param OfferService $offerService
      */
     public function __construct(
-        Request $request,
         Config $config,
-        AuthService $authService,
+        AuthServiceInterface $authService,
         FileLoaderService $loaderService,
         CategoryService $categoryService,
         OfferService $offerService
     ) {
-        $this->request = $request;
         $this->config = $config;
         $this->authService = $authService;
         $this->loaderService = $loaderService;

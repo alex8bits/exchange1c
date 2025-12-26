@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Tests\Services;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Interfaces\EventDispatcherInterface;
-use Alexnsk83\Exchange1C\ModelBuilder;
-use Alexnsk83\Exchange1C\Services\OfferService;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Interfaces\EventDispatcherInterface;
+use Bigperson\Exchange1C\ModelBuilder;
+use Bigperson\Exchange1C\Services\OfferService;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\TestCase;
 
@@ -20,6 +20,7 @@ class OfferServiceTest extends TestCase
 {
     public function testImport(): void
     {
+        $this->expectNotToPerformAssertions();
         $configValues = [
             'import_dir' => __DIR__.'/../xml',
             'models'     => [
@@ -31,13 +32,14 @@ class OfferServiceTest extends TestCase
 
         $config = new Config($configValues);
         $request = $this->createMock(Request::class);
+
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $builder = new ModelBuilder();
         $request->method('get')
             ->with('filename')
             ->willReturn('offers.xml');
 
-        $service = new OfferService($request, $config, $dispatcher, $builder);
-        $this->assertNull($service->import());
+        $service = new OfferService($config, $dispatcher, $builder);
+        $service->import('offers.xml');
     }
 }
