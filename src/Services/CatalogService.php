@@ -96,6 +96,16 @@ class CatalogService extends AbstractService
     {
         $this->authService->auth($request);
 
+        $this->startImport($filename);
+    }
+
+    public function importWithoutAuth(string $filename)
+    {
+        $this->startImport($filename);
+    }
+
+    private function startImport(string $filename): void
+    {
         switch ($filename) {
             case str_contains($filename, 'import') && str_ends_with($filename, 'xml'):
                 $this->categoryService->import($filename);
