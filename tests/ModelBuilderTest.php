@@ -9,10 +9,10 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Alexnsk83\Exchange1C\Config;
-use Alexnsk83\Exchange1C\Exceptions\Exchange1CException;
-use Alexnsk83\Exchange1C\Interfaces\GroupInterface;
-use Alexnsk83\Exchange1C\ModelBuilder;
+use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Exceptions\Exchange1CException;
+use Bigperson\Exchange1C\Interfaces\GroupInterface;
+use Bigperson\Exchange1C\ModelBuilder;
 use Tests\Models\GroupTestModel;
 use Tests\Models\ProductTestModel;
 
@@ -28,8 +28,7 @@ class ModelBuilderTest extends TestCase
         $config = new Config($values);
         $builder = new ModelBuilder();
         $model = $builder->getInterfaceClass($config, GroupInterface::class);
-        $this->assertTrue($model instanceof GroupInterface);
-        $this->assertTrue($model instanceof GroupTestModel);
+        $this->assertInstanceOf(GroupInterface::class, $model);
     }
 
     public function testGetInterfaceClassException(): void

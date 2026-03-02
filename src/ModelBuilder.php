@@ -27,7 +27,7 @@ class ModelBuilder implements ModelBuilderInterface
      *
      * @return null|mixed
      */
-    public function getInterfaceClass(Config $config, string $interface)
+    public function getInterfaceClass(Config $config, string $interface): mixed
     {
         $model = $config->getModelClass($interface);
         if ($model) {

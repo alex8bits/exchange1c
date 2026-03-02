@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Bigperson\Exchange1C\Interfaces;
 
-interface OfferInterface extends ExportFieldsInterface, IdentifierInterface
+interface   OfferInterface extends ExportFieldsInterface, IdentifierInterface
 {
     /**
      * @return GroupInterface

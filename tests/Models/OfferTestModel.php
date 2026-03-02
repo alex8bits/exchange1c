@@ -9,8 +9,8 @@ declare(strict_types=1);
 
 namespace Tests\Models;
 
-use Alexnsk83\Exchange1C\Interfaces\GroupInterface;
-use Alexnsk83\Exchange1C\Interfaces\OfferInterface;
+use Bigperson\Exchange1C\Interfaces\GroupInterface;
+use Bigperson\Exchange1C\Interfaces\OfferInterface;
 
 /**
  * Class OfferTestModel.
@@ -95,5 +95,20 @@ class OfferTestModel implements OfferInterface
     public function setSpecification1c($specification)
     {
         // TODO: Implement setSpecification1c() method.
+    }
+
+    public static function createProperties1c($properties)
+    {
+        // TODO: Implement createProperties1c() method.
+    }
+
+    public function setRemnant($rests)
+    {
+        // TODO: Implement setRemnant() method.
+    }
+
+    public function setOfferProperty1c($property)
+    {
+        // TODO: Implement setOfferProperty1c() method.
     }
 }

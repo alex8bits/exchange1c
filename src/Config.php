@@ -17,37 +17,27 @@ class Config
     /**
      * @var string
      */
-    private $importDir = 'import_dir';
-
-    /**
-     * @var string
-     */
-    private $login = 'admin';
-
-    /**
-     * @var string
-     */
-    private $password = 'admin';
+    private string $importDir = 'import_dir';
 
     /**
      * @var bool
      */
-    private $useZip = false;
+    private bool $useZip = false;
 
     /**
      * @var int
      */
-    private $filePart = 0;
-
-    /**
-     * @var null
-     */
-    private $auth = [];
+    private int $filePart = 0;
 
     /**
      * @var array
      */
-    private $models = [
+    private array $auth = [];
+
+    /**
+     * @var array
+     */
+    private array $models = [
         \Bigperson\Exchange1C\Interfaces\GroupInterface::class   => null,
         \Bigperson\Exchange1C\Interfaces\ProductInterface::class => null,
         \Bigperson\Exchange1C\Interfaces\OfferInterface::class   => null,
@@ -84,22 +74,6 @@ class Config
     public function getImportDir(): string
     {
         return $this->importDir;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLogin(): string
-    {
-        return $this->login;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPassword(): string
-    {
-        return $this->password;
     }
 
     /**
@@ -165,7 +139,7 @@ class Config
      *
      * @return string $str translated into camel caps
      */
-    private function toCamelCase($str): string
+    private function toCamelCase(string $str): string
     {
         $func = function ($c) {
             return strtoupper($c[1]);
