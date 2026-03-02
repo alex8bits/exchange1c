@@ -186,6 +186,9 @@ class CategoryService
     {
         Log::debug('parseImage $product->getImages()');
         $images = $product->getImages();
+        if (count($images) > 0) {
+            $model->clearImages();
+        }
         foreach ($images as $image) {
             Log::debug('image path ' . $image->path . '. base path ' . $image->basePath);
             $path = $this->config->getFullPath(basename($image->path));

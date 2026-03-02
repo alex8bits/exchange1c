@@ -105,6 +105,8 @@ interface ProductInterface extends IdentifierInterface
      */
     public function getOffer1c($offer);
 
+    public function clearImages(): void;
+
     /**
      * @param $types
      *
