@@ -19,6 +19,7 @@ class Config
      */
     private string $importDir = 'import_dir';
 
+
     /**
      * @var bool
      */
