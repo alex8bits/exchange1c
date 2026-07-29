@@ -9,34 +9,52 @@ declare(strict_types=1);
 
 namespace Bigperson\Exchange1C\Interfaces;
 
-interface DocumentInterface
+/**
+ * A website order, exported to 1C via type=sale (mode=query / mode=success).
+ *
+ * getExportFields1c() (inherited from ExportFieldsInterface) supplies the
+ * <Документ> level tag => value pairs (Ид, Номер, Дата, Время, ХозОперация,
+ * Роль, Валюта, Сумма, ...) — the site decides the exact field set and
+ * formatting, SaleService only orchestrates the XML structure around it.
+ */
+interface DocumentInterface extends ExportFieldsInterface, IdentifierInterface
 {
     /**
-     * Список заказов с сайта.
-     *
+     * Заказы, ещё не переданные в 1С (offers.xml > ПакетПредложений aside —
+     * this is the order side). $fromId mirrors 1C's `orderIDfrom` request
+     * parameter and may be ignored if not meaningful for the implementation.
      *
      * @return DocumentInterface[]
      */
-    public static function findDocuments1c();
+    public static function findDocuments1c(int $fromId = 0);
 
     /**
-     * Список предложений в этом заказе.
+     * Список предложений в этом заказе — each one supplies its own
+     * <Товар> tag => value pairs via getExportFields1c().
      *
-     * @return OfferInterface[]
+     * @return ExportFieldsInterface[]
      */
     public function getOffers1c();
 
     /**
-     * Получить список реквизитов в заказе.
+     * Получить список реквизитов в заказе (например статус заказа).
      *
-     * @return mixed
+     * @return array<int, array{name: string, value: string}>
      */
     public function getRequisites1c();
 
     /**
-     * Получаем контрагента у документа.
+     * Получаем контрагента у документа — its getExportFields1c() supplies
+     * the <Контрагент> tag => value pairs.
      *
-     * @return PartnerInterface
+     * @return ExportFieldsInterface
      */
     public function getPartner1c();
+
+    /**
+     * Called once 1C has acknowledged receipt (type=sale&mode=success) for
+     * the batch this document was included in — mark it as sent so the next
+     * findDocuments1c() call doesn't return it again.
+     */
+    public function markExported1c(): void;
 }

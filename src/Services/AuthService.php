@@ -29,16 +29,17 @@ class AuthService implements AuthServiceInterface
      */
     public function checkAuth(Request $request): string
     {
-        $auth = $this->config->getAuth();
+        $login = $this->config->getLogin();
         if (
-            $request->server->get('PHP_AUTH_USER') === ($auth['login'] ?? null) &&
-            $request->server->get('PHP_AUTH_PW') === ($auth['password'] ?? null)
+            $login !== '' &&
+            $request->server->get('PHP_AUTH_USER') === $login &&
+            $request->server->get('PHP_AUTH_PW') === $this->config->getPassword()
         ) {
             $session = $this->resolveSession($request);
-            $session->set(self::SESSION_KEY . '_auth', $auth['login']);
+            $session->set(self::SESSION_KEY . '_auth', $login);
             $session->save();
 
-            return "success\nlaravel_session\n" . $session->getId() . "\ntimestamp=" . time();
+            return "success\n" . $this->config->getSessionCookie() . "\n" . $session->getId() . "\ntimestamp=" . time();
         }
 
         return "failure\n";
@@ -52,7 +53,7 @@ class AuthService implements AuthServiceInterface
         $auth = $this->config->getAuth();
 
         if (!empty($auth['custom']) && isset($auth['callback'])) {
-            if (!($auth['callback'])($auth['login'], $auth['password'])) {
+            if (!($auth['callback'])($this->config->getLogin(), $this->config->getPassword())) {
                 throw new Exchange1CException('auth error');
             }
 
@@ -62,7 +63,7 @@ class AuthService implements AuthServiceInterface
         $session = $this->resolveSession($request);
         $user = $session->get(self::SESSION_KEY . '_auth');
 
-        if (!$user || $user !== ($auth['login'] ?? null)) {
+        if (!$user || $user !== $this->config->getLogin()) {
             throw new Exchange1CException('auth error');
         }
     }

@@ -31,6 +31,27 @@ class Config
     private int $filePart = 0;
 
     /**
+     * @var string
+     */
+    private string $login = '';
+
+    /**
+     * @var string
+     */
+    private string $password = '';
+
+    /**
+     * Name of the session cookie the host framework actually sets
+     * (Laravel: config('session.cookie'), typically "laravel-session").
+     * AuthService::checkAuth() reports this name back to the 1C client so
+     * the cookie it echoes on later requests is one the framework's own
+     * session middleware will recognize.
+     *
+     * @var string
+     */
+    private string $sessionCookie = 'PHPSESSID';
+
+    /**
      * @var array
      */
     private array $auth = [];
@@ -91,6 +112,30 @@ class Config
     public function getFilePart(): int
     {
         return $this->filePart;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogin(): string
+    {
+        return $this->login;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSessionCookie(): string
+    {
+        return $this->sessionCookie;
     }
 
     /**

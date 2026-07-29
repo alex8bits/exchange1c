@@ -12,10 +12,65 @@ namespace Tests\Services;
 use Bigperson\Exchange1C\Config;
 use Bigperson\Exchange1C\Services\FileLoaderService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Tests\TestCase;
 
 class FileLoaderServiceTest extends TestCase
 {
+    public function testLoadAppendsChunksWithinSameSession(): void
+    {
+        $configValues = [
+            'import_dir' => __DIR__.DIRECTORY_SEPARATOR.'1c_exchangetest',
+        ];
+        $config = new Config($configValues);
+        if (is_dir($config->getImportDir())) {
+            $this->recurseRmdir($config->getImportDir());
+        }
+
+        $session = new Session(new MockArraySessionStorage());
+        $fileLoader = new FileLoaderService($config);
+
+        $firstChunkRequest = Request::create('/?filename=test.xml', 'POST', [], [], [], [], 'first-');
+        $firstChunkRequest->query->set('filename', 'test.xml');
+        $firstChunkRequest->setSession($session);
+        $fileLoader->load($firstChunkRequest->query->get('filename'), $firstChunkRequest);
+
+        $secondChunkRequest = Request::create('/?filename=test.xml', 'POST', [], [], [], [], 'second');
+        $secondChunkRequest->query->set('filename', 'test.xml');
+        $secondChunkRequest->setSession($session);
+        $fileLoader->load($secondChunkRequest->query->get('filename'), $secondChunkRequest);
+
+        $this->assertSame('first-second', file_get_contents($config->getFullPath('test.xml')));
+        $this->recurseRmdir($config->getImportDir());
+    }
+
+    public function testLoadTruncatesOnFirstChunkOfNewSession(): void
+    {
+        $configValues = [
+            'import_dir' => __DIR__.DIRECTORY_SEPARATOR.'1c_exchangetest',
+        ];
+        $config = new Config($configValues);
+        if (is_dir($config->getImportDir())) {
+            $this->recurseRmdir($config->getImportDir());
+        }
+
+        $fileLoader = new FileLoaderService($config);
+
+        $staleRequest = Request::create('/?filename=test.xml', 'POST', [], [], [], [], 'stale-leftover-bytes');
+        $staleRequest->query->set('filename', 'test.xml');
+        $staleRequest->setSession(new Session(new MockArraySessionStorage()));
+        $fileLoader->load($staleRequest->query->get('filename'), $staleRequest);
+
+        $newSessionRequest = Request::create('/?filename=test.xml', 'POST', [], [], [], [], 'fresh');
+        $newSessionRequest->query->set('filename', 'test.xml');
+        $newSessionRequest->setSession(new Session(new MockArraySessionStorage()));
+        $fileLoader->load($newSessionRequest->query->get('filename'), $newSessionRequest);
+
+        $this->assertSame('fresh', file_get_contents($config->getFullPath('test.xml')));
+        $this->recurseRmdir($config->getImportDir());
+    }
+
     public function testLoad(): void
     {
         $configValues = [
@@ -30,7 +85,7 @@ class FileLoaderServiceTest extends TestCase
             $this->recurseRmdir($config->getImportDir());
         }
 
-        $fileLoader->load($request->query->get('filename'));
+        $fileLoader->load($request->query->get('filename'), $request);
         $this->assertFileExists($config->getFullPath('test.xml'));
         $this->recurseRmdir($config->getImportDir());
     }
@@ -50,7 +105,7 @@ class FileLoaderServiceTest extends TestCase
             $this->recurseRmdir($config->getImportDir());
         }
 
-        $fileLoader->load($request->query->get('filename'));
+        $fileLoader->load($request->query->get('filename'), $request);
         $this->assertFileDoesNotExist($config->getFullPath('test.zip'));
         $this->recurseRmdir($config->getImportDir());
     }
@@ -64,7 +119,7 @@ class FileLoaderServiceTest extends TestCase
         $request = new Request();
         $request->query->set('filename', 'test.xml');
         $fileLoader = new FileLoaderService($config);
-        $fileLoader->load($request->query->get('filename'));
+        $fileLoader->load($request->query->get('filename'), $request);
         $fileLoader->clearImportDirectory();
         $this->assertFileExists($config->getFullPath('test.xml'));
         $this->recurseRmdir($config->getImportDir());
@@ -79,7 +134,7 @@ class FileLoaderServiceTest extends TestCase
         $request = new Request();
         $request->query->set('filename', 'orders.xml');
         $fileLoader = new FileLoaderService($config);
-        $fileLoader->load($request->query->get('filename'));
+        $fileLoader->load($request->query->get('filename'), $request);
     }
 
     /**

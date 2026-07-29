@@ -74,7 +74,7 @@ class CatalogService extends AbstractService
     {
         $this->authService->auth($request);
 
-        return $this->loaderService->load($request->query->get('filename'));
+        return $this->loaderService->load($request->query->get('filename'), $request);
     }
 
     /**
