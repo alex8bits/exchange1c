@@ -10,11 +10,14 @@ declare(strict_types=1);
 namespace Bigperson\Exchange1C\Services;
 
 use Bigperson\Exchange1C\Config;
+use Bigperson\Exchange1C\Exceptions\Exchange1CException;
 use Bigperson\Exchange1C\Interfaces\DocumentInterface;
 use Bigperson\Exchange1C\Interfaces\ModelBuilderInterface;
 use DOMDocument;
 use DOMElement;
 use Symfony\Component\HttpFoundation\Request;
+use Zenwalker\CommerceML\CommerceML;
+use Zenwalker\CommerceML\Model\Document as CommerceMlDocument;
 
 /**
  * Class SaleService
@@ -85,6 +88,73 @@ class SaleService
         }
 
         return "success\n";
+    }
+
+    /**
+     * 1C also pushes order updates back to the site: type=sale&mode=file
+     * uploads a CommerceML orders file (handled generically by
+     * CatalogService::file(), same as catalog uploads — it's just a byte
+     * sink keyed by filename), then type=sale&mode=import processes it —
+     * this is that processing step. Matches each incoming <Документ> to a
+     * local order by the Ид it was originally exported with and hands the
+     * raw fields/requisites to the host app to interpret (status vocabulary
+     * is 1C-instance-specific, so this package doesn't guess at it).
+     *
+     * @throws Exchange1CException
+     */
+    public function importUpdates(string $filename): void
+    {
+        $filename = basename($filename);
+        $filePath = $this->config->getFullPath($filename);
+        if (!is_file($filePath)) {
+            throw new Exchange1CException("File not found for import: {$filePath}");
+        }
+
+        $commerce = new CommerceML();
+        $commerce->loadOrdersXml($filePath);
+
+        $documentClass = $this->getDocumentClass();
+        foreach ($commerce->order->documents as $incoming) {
+            $localDocument = $documentClass::findByExternalId1c((string) $incoming->id);
+            if ($localDocument === null) {
+                continue;
+            }
+
+            $localDocument->applyIncomingUpdate1c(
+                $this->extractScalarFields($incoming),
+                $this->extractRequisites($incoming)
+            );
+        }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function extractScalarFields(CommerceMlDocument $document): array
+    {
+        $fields = [];
+        foreach ($document->xml->children() as $tag => $node) {
+            // Skip container elements (Контрагенты, Товары, ЗначенияРеквизитов, ...) —
+            // only plain leaf tags (Ид, Номер, Дата, Время, Сумма, ...) are meaningful here.
+            if ($node->count() === 0) {
+                $fields[$tag] = trim((string) $node);
+            }
+        }
+
+        return $fields;
+    }
+
+    /**
+     * @return array<int, array{name: string, value: string}>
+     */
+    private function extractRequisites(CommerceMlDocument $document): array
+    {
+        $requisites = [];
+        foreach ($document->getRequisites() ?? [] as $requisite) {
+            $requisites[] = ['name' => (string) $requisite->name, 'value' => (string) $requisite->value];
+        }
+
+        return $requisites;
     }
 
     private function getDocumentClass(): DocumentInterface

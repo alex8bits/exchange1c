@@ -66,11 +66,18 @@ class OfferService
     {
         $filename = basename($filename);
 
+        $filePath = $this->config->getFullPath($filename);
+        if (!is_file($filePath)) {
+            // See CategoryService::import() for why this check exists: without it,
+            // a missing file is silently parsed as (invalid) XML content instead of failing.
+            throw new Exchange1CException("File not found for import: {$filePath}");
+        }
+
         $this->_ids = [];
         $commerce = new CommerceML();
 
         $classifierFile = $this->config->getFullPath('classifier.xml');
-        $commerce->loadOffersXml($this->config->getFullPath($filename));
+        $commerce->loadOffersXml($filePath);
         if ($commerce->classifier->xml) {
             $commerce->classifier->xml->saveXML($classifierFile);
         } else {

@@ -57,4 +57,20 @@ interface DocumentInterface extends ExportFieldsInterface, IdentifierInterface
      * findDocuments1c() call doesn't return it again.
      */
     public function markExported1c(): void;
+
+    /**
+     * 1C also sends order updates back to the site (type=sale&mode=file,
+     * then mode=import) — status changes, payment/shipping confirmation,
+     * etc. Looks up the local order this incoming <Документ> refers to, by
+     * whatever Ид it was exported with (see getExportFields1c()'s 'Ид').
+     */
+    public static function findByExternalId1c(string $id);
+
+    /**
+     * Applies an incoming update from 1C to this order.
+     *
+     * @param array<string, string>              $fields     <Документ> level tag => value (Ид, Номер, Дата, Сумма, ...)
+     * @param array<int, array{name: string, value: string}> $requisites <ЗначенияРеквизитов> as name/value pairs
+     */
+    public function applyIncomingUpdate1c(array $fields, array $requisites): void;
 }

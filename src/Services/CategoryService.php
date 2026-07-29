@@ -60,8 +60,16 @@ class CategoryService
     public function import(string $filename): void
     {
         $filename = basename($filename);
+        $filePath = $this->config->getFullPath($filename);
+        if (!is_file($filePath)) {
+            // CommerceML::loadXml() also accepts a raw XML string, so a missing
+            // path would otherwise be parsed as (invalid) XML content and silently
+            // produce zero groups/products instead of failing — catch it here,
+            // where we know this is always meant to be a file.
+            throw new Exchange1CException("File not found for import: {$filePath}");
+        }
         $commerce = new CommerceML();
-        $commerce->loadImportXml($this->config->getFullPath($filename));
+        $commerce->loadImportXml($filePath);
         $classifierFile = $this->config->getFullPath('classifier.xml');
         if ($commerce->classifier->xml) {
             $commerce->classifier->xml->saveXML($classifierFile);
