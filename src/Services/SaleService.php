@@ -232,13 +232,32 @@ class SaleService
     }
 
     /**
-     * @param array<string, string> $fields
+     * Builds child elements from a tag => value map.
+     *
+     * $value is normally a scalar and becomes a plain text node (unchanged
+     * behaviour). CommerceML also has a handful of tags — Телефон, Email,
+     * Адрес, АдресРегистрации — that 1C expects as a container with a
+     * nested <Представление> (and, for phones/addresses, further optional
+     * sub-fields). To support those without a second code path, $value may
+     * also be an array; in that case it is expanded recursively as child
+     * elements instead of a text node, e.g.:
+     *
+     *   ['Телефон' => ['Представление' => '+380...']]
+     *   // => <Телефон><Представление>+380...</Представление></Телефон>
+     *
+     * @param array<string, mixed> $fields
      */
     private function appendFields(DOMDocument $dom, DOMElement $parent, array $fields): void
     {
         foreach ($fields as $tag => $value) {
             $el = $dom->createElement((string) $tag);
-            $el->appendChild($dom->createTextNode((string) $value));
+
+            if (is_array($value)) {
+                $this->appendFields($dom, $el, $value);
+            } else {
+                $el->appendChild($dom->createTextNode((string) $value));
+            }
+
             $parent->appendChild($el);
         }
     }
