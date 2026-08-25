@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Bigperson\Exchange1C\Services;
 
 use Bigperson\Exchange1C\Config;
-use LogicException;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use ZipArchive;
@@ -52,9 +51,6 @@ class FileLoaderService
         $filename = basename($filename);
 
         $filePath = $this->config->getFullPath($filename);
-        if (str_contains($filename, 'orders')) {
-            throw new LogicException('This method is not released');
-        }
         $directory = dirname($filePath);
         if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
             throw new RuntimeException(sprintf('Directory "%s" was not created', $directory));
