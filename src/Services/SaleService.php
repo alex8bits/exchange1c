@@ -221,11 +221,11 @@ class SaleService
         $requisiteEl = $dom->createElement('ЗначениеРеквизита');
 
         $nameEl = $dom->createElement('Наименование');
-        $nameEl->appendChild($dom->createTextNode((string) $requisite['name']));
+        $nameEl->appendChild($dom->createTextNode($this->sanitizeText((string) $requisite['name'])));
         $requisiteEl->appendChild($nameEl);
 
         $valueEl = $dom->createElement('Значение');
-        $valueEl->appendChild($dom->createTextNode((string) $requisite['value']));
+        $valueEl->appendChild($dom->createTextNode($this->sanitizeText((string) $requisite['value'])));
         $requisiteEl->appendChild($valueEl);
 
         return $requisiteEl;
@@ -255,10 +255,30 @@ class SaleService
             if (is_array($value)) {
                 $this->appendFields($dom, $el, $value);
             } else {
-                $el->appendChild($dom->createTextNode((string) $value));
+                $el->appendChild($dom->createTextNode($this->sanitizeText((string) $value)));
             }
 
             $parent->appendChild($el);
         }
+    }
+
+    /**
+     * 1C re-encodes the export to windows-1251 as plain text, after XML escaping:
+     * an emoji can turn into markup (a heart becomes "<3") and break the whole batch.
+     * Only text that fits windows-1251 may leave the site.
+     */
+    private function sanitizeText(string $value): string
+    {
+        // XML 1.0 forbids these control characters even when escaped.
+        $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', mb_scrub($value, 'UTF-8')) ?? '';
+
+        // The Ukrainian apostrophe (U+02BC) has no windows-1251 slot; dropping it would corrupt words.
+        $value = str_replace("\u{02BC}", "'", $value);
+
+        return preg_replace_callback(
+            '/[^\x00-\x7F]/u',
+            static fn (array $char): string => mb_convert_encoding($char[0], 'Windows-1251', 'UTF-8') === '?' ? '' : $char[0],
+            $value
+        ) ?? '';
     }
 }

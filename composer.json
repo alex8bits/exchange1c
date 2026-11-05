@@ -33,6 +33,8 @@
   },
   "require": {
     "php": ">=8.0",
+    "ext-dom": "*",
+    "ext-mbstring": "*",
     "ext-zip": "*",
     "ext-simplexml": "*",
     "imrev-agency/commerceml": "^1.1.0 || dev-master",
